@@ -1,11 +1,9 @@
-import { get } from "http";
 import axiosClient from "./axiosClient";
 
-const handleAPI = async ({url, data,method,}:{url: string, data?: any, method?: 'get' |'post' | 'put' | 'delete';}) => {
+const handleAPI = async ({ url, data, method, }: { url: string, data?: any, method?: 'get' | 'post' | 'put' | 'delete' | 'patch'; }) => {
     return await axiosClient(url, {
         method: method ?? 'get',
         data,
     })
 }
 export default handleAPI;
-

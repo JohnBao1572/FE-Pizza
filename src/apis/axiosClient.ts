@@ -1,23 +1,21 @@
 import axios from "axios";
-import { error } from "console";
-import { config } from "process";
 import queryString from "query-string";
-import { appInfo } from "../constants/appInfos";
+import { appInfo, localDataNames } from "../constants/appInfos";
+
 
 const axiosClient = axios.create({
     baseURL: appInfo.baseUrl,
-    // paramsSerializer: (params) => queryString.stringify(params),
     paramsSerializer: (params) => queryString.stringify(params),
 });
 
 const getAccesstoken = () => {
-	const res = localStorage.getItem('authData');
+    const res = localStorage.getItem(localDataNames.authData);
 
-	return res ? JSON.parse(res).accesstoken : '';
+    return res ? JSON.parse(res).accessToken : '';
 };
 
 axiosClient.interceptors.request.use(async (config: any) => {
-    const accesstoken = getAccesstoken(); 
+    const accesstoken = getAccesstoken();
 
     // FIxing
     // console.log("Request URL:", config.url); // Log URL để kiểm tra
@@ -29,10 +27,10 @@ axiosClient.interceptors.request.use(async (config: any) => {
         ...config.headers,
     }
 
-    return {...config, data:config.data ?? undefined};
+    return { ...config, data: config.data ?? undefined };
 });
 
-axios.interceptors.response.use(
+axiosClient.interceptors.response.use(
     (res) => {
         if (res.data && res.status >= 200 && res.status < 300) {
             return res.data.data;
@@ -40,7 +38,7 @@ axios.interceptors.response.use(
             return Promise.reject(res.data)
         }
     },
-    (error) => {
+    (error: any) => {
         const { response } = error;
 
         console.error("Response error:", response); // Log error response để kiểm tra
