@@ -3,8 +3,8 @@ import { Provider } from 'react-redux';
 import store from './reduxs/store';
 import Routers from './routers/Routers';
 import Dashboard from './pages/auth/Dashboard';
-import LoginAdmin from './pages/auth/Loginadmin';
 import Home from './pages/users/Home';
+import LoginAdmin from './pages/auth/LoginAdmin';
 
 function App() {
   return (
