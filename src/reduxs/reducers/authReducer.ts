@@ -2,23 +2,22 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+    data: null as null | {
+        accessToken: string;
+        _id: string;
+    }
+};
+
 const authSlice = createSlice({
 	name: 'auth',
-	initialState: {
-		data: {
-			accessToken: '',
-			_id: '',
-		},
-	},
+	initialState,
 	reducers: {
 		addAuth: (state, action) => {
 			state.data = action.payload;
 		},
-		removeAuth: (state, _action) => {
-			state.data = {
-				accessToken: '',
-				_id: '',
-			};
+		removeAuth: (state) => {
+			state.data = null;
 		},
 	},
 });

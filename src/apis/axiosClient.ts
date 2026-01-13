@@ -8,10 +8,20 @@ const axiosClient = axios.create({
     paramsSerializer: (params) => queryString.stringify(params),
 });
 
+// const getAccesstoken = () => {
+//     const res = localStorage.getItem(localDataNames.authData);
+
+//     return res ? JSON.parse(res).accessToken : '';
+// };
+
 const getAccesstoken = () => {
     const res = localStorage.getItem(localDataNames.authData);
-
-    return res ? JSON.parse(res).accessToken : '';
+    if (!res) return '';
+    try {
+        return JSON.parse(res).accessToken || '';
+    } catch {
+        return '';
+    }
 };
 
 axiosClient.interceptors.request.use(async (config: any) => {

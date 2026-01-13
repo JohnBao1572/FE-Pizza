@@ -12,26 +12,31 @@ const Routers = ({ Component, pageProps }: any) => {
 	const auth = useSelector(authSelector);
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		getData();
-	}, []);
-
+	// ================== FIX 1: Load auth từ localStorage vào redux đúng cách ==================
 	useEffect(() => {
 		const res = localStorage.getItem(localDataNames.authData);
-		const localToken = res ? JSON.parse(res).accessToken : '';
-		const token = auth.accessToken || localToken;
+		if (res) {
+			const parsed = JSON.parse(res);
+			if (parsed?.accessToken) {
+				dispatch(addAuth(parsed));
+			}
+		}
+	}, [dispatch]);
+	// ================================================================================
+
+	// ================== FIX 2: Chỉ check token từ redux, bỏ localToken ==================
+	useEffect(() => {
+		const token = auth?.accessToken;
+
+		if (!token && !path.includes('/auth')) {
+			navigate('/auth/login', { replace: true });
+		}
 
 		if (token && path.includes('/auth')) {
-			navigate('/');
-		} else if (!token && !path.includes('/auth')) {
-			navigate('/auth/login');
+			navigate('/', { replace: true });
 		}
 	}, [auth, path, navigate]);
-
-	const getData = async () => {
-		const res = localStorage.getItem(localDataNames.authData);
-		res && dispatch(addAuth(JSON.parse(res)));
-	};
+	// ================================================================================
 
 	return path.includes('/auth') ? (
 		<div className='bg-white min-h-screen'>
@@ -39,7 +44,6 @@ const Routers = ({ Component, pageProps }: any) => {
 		</div>
 	) : (
 		<div className='bg-white min-h-screen'>
-			{/* <HeaderComponent /> */}
 			<Component pageProps={pageProps} />
 		</div>
 	);
