@@ -2,9 +2,9 @@ import { useState } from 'react';
 import {
   FaBoxOpen,
   FaListUl,
-  FaFileInvoiceDollar,
   FaShoppingCart,
   FaSignOutAlt,
+  FaUser,
 } from "react-icons/fa";
 import { FiSettings, FiHelpCircle } from "react-icons/fi";
 import CategoryTable from '../../components/auth/category/CategoryTable';
@@ -15,13 +15,13 @@ import { removeAuth } from '../../reduxs/reducers/authReducer';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../apis/axiosClient';
 
-const Home = () => {
+const Dashboard = () => {
   const [activeKey, setActiveKey] = useState('dashboard');
 
   const menuItems = [
     { icon: <FaBoxOpen />, label: 'Products', key: 'products' },
     { icon: <FaListUl />, label: 'Category', key: 'category' },
-    { icon: <FaFileInvoiceDollar />, label: 'Bills', key: 'bills' },
+    { icon: <FaUser />, label: 'Users', key: 'users' },
     { icon: <FaShoppingCart />, label: 'Carts', key: 'carts' },
   ];
   const dispatch = useDispatch();
@@ -36,9 +36,9 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen w-screen bg-gray-50 flex overflow-hidden">
       {/* ================= Sidebar ================= */}
-      <aside className="w-64 bg-white border-r flex flex-col">
+      <aside className="w-64 min-w-[256px] bg-white border-r flex flex-col">
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b">
           <span className="text-xl font-bold text-gray-800">🍕 React Pizza</span>
@@ -95,7 +95,7 @@ const Home = () => {
       </aside>
 
       {/* ================= Main Content ================= */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 w-full flex flex-col overflow-hidden">
         {/* Header */}
         <header className="h-16 bg-white border-b flex items-center justify-between px-6">
           <h1 className="text-xl font-semibold text-gray-800 capitalize">
@@ -165,4 +165,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Dashboard;

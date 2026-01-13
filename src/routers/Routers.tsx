@@ -22,21 +22,18 @@ const Routers = ({ Component, pageProps }: any) => {
 			}
 		}
 	}, [dispatch]);
-	// ================================================================================
 
-	// ================== FIX 2: Chỉ check token từ redux, bỏ localToken ==================
 	useEffect(() => {
 		const token = auth?.accessToken;
 
-		if (!token && !path.includes('/auth')) {
-			navigate('/auth/login', { replace: true });
+		if (!token && !path.includes('/auth') && path !== '/') {
+			navigate('/auth/loginAdmin', { replace: true });
 		}
 
 		if (token && path.includes('/auth')) {
-			navigate('/', { replace: true });
+			navigate('/Dashboard', { replace: true });
 		}
 	}, [auth, path, navigate]);
-	// ================================================================================
 
 	return path.includes('/auth') ? (
 		<div className='bg-white min-h-screen'>

@@ -2,15 +2,17 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './reduxs/store';
 import Routers from './routers/Routers';
-import Login from './pages/auth/Login';
-import Home from './pages/auth/Home';
+import Dashboard from './pages/auth/Dashboard';
+import LoginAdmin from './pages/auth/Loginadmin';
+import Home from './pages/users/Home';
 
 function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
-          <Route path="/auth/login" element={<Routers Component={Login} />} />
+          <Route path="/auth/loginAdmin" element={<Routers Component={LoginAdmin} />} />
+          <Route path="/Dashboard" element={<Routers Component={Dashboard} />} />
           <Route path="/" element={<Routers Component={Home} />} />
         </Routes>
       </BrowserRouter>
