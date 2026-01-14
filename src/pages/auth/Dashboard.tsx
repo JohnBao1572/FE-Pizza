@@ -14,6 +14,8 @@ import { useDispatch } from 'react-redux';
 import { removeAuth } from '../../reduxs/reducers/authReducer';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../apis/axiosClient';
+import { MdDiscount } from 'react-icons/md';
+import DiscountTable from '../../components/auth/discounts/DiscountTable';
 
 const Dashboard = () => {
   const [activeKey, setActiveKey] = useState('dashboard');
@@ -23,6 +25,7 @@ const Dashboard = () => {
     { icon: <FaListUl />, label: 'Category', key: 'category' },
     { icon: <FaUser />, label: 'Users', key: 'users' },
     { icon: <FaShoppingCart />, label: 'Carts', key: 'carts' },
+    { icon: <MdDiscount />, label: 'Discounts', key: 'discounts' },
   ];
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -36,7 +39,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen w-screen bg-gray-50 flex overflow-hidden">
+    <div className="min-h-screen w-full bg-gray-50 flex overflow-hidden">
       {/* ================= Sidebar ================= */}
       <aside className="w-64 min-w-[256px] bg-white border-r flex flex-col">
         {/* Logo */}
@@ -120,7 +123,13 @@ const Dashboard = () => {
             </div>
           )}
 
-          {activeKey !== 'category' && activeKey !== 'products' && activeKey !== 'dashboard' && (
+          {activeKey === 'discounts' && (
+            <div className="bg-white rounded-xl shadow p-6">
+              <DiscountTable />
+            </div>
+          )}
+
+          {activeKey !== 'category' && activeKey !== 'products' && activeKey !== 'dashboard' && activeKey !== 'discounts' &&(
             <div className="bg-white rounded-xl shadow p-10 text-center">
               <h2 className="text-2xl font-bold mb-2">{activeKey}</h2>
               <p className="text-gray-500">Chức năng đang được phát triển...</p>

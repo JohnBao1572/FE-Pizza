@@ -12,7 +12,8 @@ const Header = () => {
             <div className="container mx-auto flex items-center px-4 py-3 justify-between">
                 {/* Logo */}
                 <div className="flex items-center">
-                    <img src="/logo.png" alt="Pizza Hut Logo" className="h-10 mr-4" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/960px-Domino%27s_pizza_logo.svg.png" alt="Pizza Hut Logo" className="h-10 mr-4" />
+                    <span>Bao's Pizza</span>
                 </div>
 
                 {/* Navigation */}

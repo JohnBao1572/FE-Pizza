@@ -17,7 +17,6 @@ const ProductTable = () => {
         setIsLoading(true);
         try {
             const res: any = await handleAPI({ url: '/products/getAll', method: 'get' });
-            console.log(res);
             if (res) {
                 setProducts(res);
             }
@@ -56,45 +55,61 @@ const ProductTable = () => {
             title: 'Image',
             dataIndex: 'image',
             key: 'image',
-            render: (url: string) => <Image src={url} width={50} height={50} style={{ objectFit: 'cover', borderRadius: 4 }} />
+            width: 80,
+            render: (url: string) => (
+                <Image
+                    src={url}
+                    width={50}
+                    height={50}
+                    preview={false}
+                    style={{ objectFit: 'cover', borderRadius: 4, display: 'block' }}
+                />
+            ),
         },
         {
             title: 'Title',
             dataIndex: 'title',
             key: 'title',
+            width: 150,
+            ellipsis: true,
         },
         {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
-            render: (val: number) => `$${val}`
+            width: 120,
+            render: (val: number) => `$${val}`,
         },
         {
             title: 'Category',
             dataIndex: 'cat',
             key: 'cat',
-            render: (item: any) => <Tag color="blue">{item?.title || 'N/A'}</Tag>
+            width: 160,
+            render: (item: any) => (
+                <Tag style={{ maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item?.title || 'N/A'}
+                </Tag>
+            ),
         },
         {
             title: 'Description',
             dataIndex: 'description',
             key: 'description',
+            width: 150,
             ellipsis: true,
         },
         {
             title: 'Status',
             dataIndex: 'isDeleted',
             key: 'isDeleted',
+            width: 120,
             render: (isDeleted: boolean) =>
-                isDeleted ? (
-                    <Tag color="red">Inactive</Tag>
-                ) : (
-                    <Tag color="green">Active</Tag>
-                ),
+                isDeleted ? <Tag color="red">Inactive</Tag> : <Tag color="green">Active</Tag>,
         },
         {
             title: 'Actions',
             key: 'actions',
+            width: 140,
             render: (_: any, record: Product) => (
                 <Space>
                     <Tooltip title="Edit">
@@ -117,12 +132,12 @@ const ProductTable = () => {
                         />
                     </Tooltip>
                 </Space>
-            )
-        }
+            ),
+        },
     ];
 
     return (
-        <div>
+        <div style={{ width: '100%', overflowX: 'hidden' }}>
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
                     Add Product
@@ -135,6 +150,7 @@ const ProductTable = () => {
                 columns={columns}
                 rowKey="id"
                 pagination={{ pageSize: 10 }}
+                tableLayout="fixed"
             />
 
             <AddProductModal
