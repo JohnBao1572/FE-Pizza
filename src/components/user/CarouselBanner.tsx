@@ -49,7 +49,7 @@ const CarouselBanner = () => {
     }
 
     return (
-        <div className="container mx-auto px-4">
+        <div className="w-full max-w-screen-xl mx-auto">
             <div className="w-full h-64 rounded-xl overflow-hidden shadow-lg relative z-0">
                 <Carousel autoplay>
                     {banners.map((banner) => (

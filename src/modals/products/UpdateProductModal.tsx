@@ -26,6 +26,7 @@ const UpdateProductModal = ({ open, onClose, onUpdate, product }: Props) => {
             form.setFieldsValue({
                 title: product.title,
                 price: product.price,
+                quantity: product.quantity,
                 image: product.image,
                 description: product.description,
                 cat: product.cat?.id, 
@@ -49,6 +50,7 @@ const UpdateProductModal = ({ open, onClose, onUpdate, product }: Props) => {
             const payload = {
                 title: values.title ?? product?.title,
                 price: values.price ?? product?.price,
+                quantity: values.quantity ?? product?.quantity,
                 image: values.image ?? product?.image,
                 description: values.description ?? product?.description,
                 cat: values.cat ?? product?.cat?.id,
@@ -106,6 +108,14 @@ const UpdateProductModal = ({ open, onClose, onUpdate, product }: Props) => {
                     rules={[{ required: true, message: 'Please enter price' }]}
                 >
                     <InputNumber style={{ width: '100%' }} min={0} placeholder="Price" />
+                </Form.Item>
+
+                <Form.Item
+                    name="quantity"
+                    label="Quantity"
+                    rules={[{ required: true, message: 'Please enter quantity' }]}
+                >
+                    <InputNumber style={{ width: '100%' }} min={0} placeholder="Quantity" />
                 </Form.Item>
 
                 <Form.Item

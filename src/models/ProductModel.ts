@@ -8,9 +8,10 @@ export interface Product {
     description: string;
     image: string;
     price: number;
+    quantity: number;
     isDeleted: boolean;
     createdAt: string;
     updatedAt: string;
     cat: Category;
-    addedBy: User;
+    addedBy: User; 
 }

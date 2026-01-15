@@ -110,6 +110,14 @@ const AddProductModal = ({ open, onClose, onAddNew }: Props) => {
                 </Form.Item>
 
                 <Form.Item
+                    name="quantity"
+                    label="Quantity"
+                    rules={[{ required: true, message: 'Please enter quantity' }]}
+                >
+                    <InputNumber style={{ width: '100%' }} min={0} placeholder="Quantity" />
+                </Form.Item>
+
+                <Form.Item
                     name="image"
                     label="Image URL"
                     rules={[{ required: true, message: 'Please enter image URL' }]}

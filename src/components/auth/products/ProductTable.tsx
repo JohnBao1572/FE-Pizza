@@ -81,6 +81,12 @@ const ProductTable = () => {
             render: (val: number) => `$${val}`,
         },
         {
+            title: 'Quantity',
+            dataIndex: 'quantity',
+            key: 'quantity',
+            width: 100,
+        },
+        {
             title: 'Category',
             dataIndex: 'cat',
             key: 'cat',
