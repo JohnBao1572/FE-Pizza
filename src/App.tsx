@@ -6,6 +6,9 @@ import Dashboard from './pages/auth/Dashboard';
 import Home from './pages/users/Home';
 import LoginAdmin from './pages/auth/LoginAdmin';
 import ProductsDetails from './pages/users/products/[slug]/[id]/ProductsDetails';
+import Login from './pages/users/login/Login';
+import Register from './pages/users/login/SignUp';
+import SignUp from './pages/users/login/SignUp';
 
 function App() {
   return (
@@ -13,6 +16,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/users/products/:slug/:id" element={<Routers Component={ProductsDetails} />} />
+          <Route path="/login" element={<Routers Component={Login} />} />
+          <Route path="/SignUp" element={<Routers Component={SignUp} />} />
+          <Route path="/register" element={<Routers Component={Register} />} />
           <Route path="/auth/loginAdmin" element={<Routers Component={LoginAdmin} />} />
           <Route path="/Dashboard" element={<Routers Component={Dashboard} />} />
           <Route path="/" element={<Routers Component={Home} />} />

@@ -1,96 +1,133 @@
-// import React, { useState } from 'react';
-// import handleAPI from '../../apis/handleAPI';
-// import { localDataNames } from '../../constants/appInfos';
-// import axiosClient from '../../apis/axiosClient';
-// import type { LoginResponse } from '../../models/UserModel';
-// import { useNavigate } from 'react-router-dom';
-// import { useDispatch } from 'react-redux';
-// import { addAuth } from '../../reduxs/reducers/authReducer';
+import { useState } from 'react';
+import { Form, Input, Button, Spin, message } from 'antd';
+import { GoogleOutlined, FacebookOutlined, GithubOutlined, LinkedinOutlined } from '@ant-design/icons';
 
-// const Login = () => {
-//     const [email, setEmail] = useState('');
-//     const [password, setPassword] = useState('');
-//     const [isLoading, setIsLoading] = useState(false);
-//     const [errorMsg, setErrorMsg] = useState('');
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import handleAPI from '../../../apis/handleAPI';
+import type { LoginResponse } from '../../../models/UserModel';
+import { localDataNames } from '../../../constants/appInfos';
+import { addAuth } from '../../../reduxs/reducers/authReducer';
+import axiosClient from '../../../apis/axiosClient';
+const Login = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
-//     const navigate = useNavigate();
-//     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-//     const handleLogin = async (e: React.FormEvent) => {
-//         e.preventDefault();
-//         setIsLoading(true);
-//         setErrorMsg('');
+    const handleLogin = async (values: { email: string; password: string }) => {
+        setIsLoading(true);
+        setErrorMsg('');
 
-//         try {
-//             const res = await handleAPI({
-//                 url: '/auths/login-admin',
-//                 data: {
-//                     email,
-//                     password
-//                 },
-//                 method: 'post'
-//             }) as unknown as LoginResponse;
+        try {
+            const res = await handleAPI({
+                url: '/user/login',
+                data: values,
+                method: 'post'
+            }) as unknown as LoginResponse;
 
-//             // ================== FIX: Lưu token + sync redux ==================
-//             localStorage.setItem(localDataNames.authData, JSON.stringify(res));
-//             dispatch(addAuth(res));
+            localStorage.setItem(localDataNames.authData, JSON.stringify(res));
+            dispatch(addAuth(res));
+            axiosClient.defaults.headers.common['Authorization'] = `Bearer ${res.accessToken}`;
 
-//             // Đặt header mặc định cho axios để các request kế tiếp dùng token mới
-//             axiosClient.defaults.headers.common['Authorization'] = `Bearer ${res.accessToken}`;
-//             // ================================================================
-//             alert('Đăng nhập thành công!');
-//             navigate('/Dashboard', { replace: true });
-//         } catch (error: any) {
-//             console.error(error);
-//             setErrorMsg(error.message || 'Đăng nhập thất bại, vui lòng kiểm tra lại!');
-//         } finally {
-//             setIsLoading(false);
-//         }
-//     };
+            navigate('/', { replace: true });
+        } catch (error) {
+            message.error("Login failed, please try again");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-//     return (
-//         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f5f5f5' }}>
-//             <div style={{ padding: '2rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
-//                 <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Đăng Nhập</h2>
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-100">
+            {/* MAIN CARD */}
+            <div className="w-[900px] h-[520px] bg-white rounded-2xl shadow-2xl flex overflow-hidden">
 
-//                 {errorMsg && <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{errorMsg}</div>}
+                {/* LEFT - FORM (CENTERED) */}
+                <div className="w-1/2 flex items-center justify-center">
+                    <div className="w-[80%]">
+                        <h2 className="text-3xl font-bold text-center mb-3">Sign In</h2>
 
-//                 <form onSubmit={handleLogin}>
-//                     <div style={{ marginBottom: '1rem' }}>
-//                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email:</label>
-//                         <input
-//                             type="email"
-//                             value={email}
-//                             onChange={(e) => setEmail(e.target.value)}
-//                             required
-//                             style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-//                             placeholder="Nhập email..."
-//                         />
-//                     </div>
+                        {/* Social */}
+                        <div className="flex justify-center gap-3 mb-4">
+                            <div className="w-10 h-10 border rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                                <GoogleOutlined />
+                            </div>
+                            <div className="w-10 h-10 border rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                                <FacebookOutlined />
+                            </div>
+                            <div className="w-10 h-10 border rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                                <GithubOutlined />
+                            </div>
+                            <div className="w-10 h-10 border rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                                <LinkedinOutlined />
+                            </div>
+                        </div>
 
-//                     <div style={{ marginBottom: '1.5rem' }}>
-//                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Mật khẩu:</label>
-//                         <input
-//                             type="password"
-//                             value={password}
-//                             onChange={(e) => setPassword(e.target.value)}
-//                             required
-//                             style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-//                             placeholder="Nhập mật khẩu..."
-//                         />
-//                     </div>
+                        <p className="text-center text-gray-400 text-sm mb-4">
+                            Sign in with Email & Password
+                        </p>
 
-//                     <button
-//                         type="submit"
-//                         disabled={isLoading}
-//                         style={{ width: '100%', padding: '0.75rem', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
-//                     >
-//                         {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
-//                     </button>
-//                 </form>
-//             </div>
-//         </div>
-//     );
-// };
+                        {errorMsg && (
+                            <div className="mb-3 text-center text-red-500 font-medium">
+                                {errorMsg}
+                            </div>
+                        )}
 
-// export default Login;
+                        <Form layout="vertical" onFinish={handleLogin}>
+                            <Form.Item
+                                name="email"
+                                rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
+                            >
+                                <Input size="large" placeholder="Enter E-mail" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="password"
+                                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+                            >
+                                <Input.Password size="large" placeholder="Enter Password" />
+                            </Form.Item>
+
+                            <div className="text-right text-sm text-gray-400 cursor-pointer hover:underline mb-4">
+                                Forget Password?
+                            </div>
+
+                            <Button
+                                htmlType="submit"
+                                type="primary"
+                                danger
+                                block
+                                size="large"
+                                className="rounded-full"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? <Spin /> : 'SIGN IN'}
+                            </Button>
+                        </Form>
+                    </div>
+                </div>
+
+                {/* RIGHT - RED PANEL */}
+                <div className="w-1/2 bg-red-500 text-white flex flex-col items-center justify-center px-10">
+                    <h2 className="text-4xl font-bold mb-4">Hello World</h2>
+                    <p className="text-center mb-6">
+                        Sign up now and enjoy our site
+                    </p>
+                    <Link to="/SignUp">
+                        <Button
+                            ghost
+                            size="large"
+                            className="rounded-full px-10 border-white text-white hover:!text-red-500 hover:!bg-white"
+                        >
+                            SIGN UP
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Login;

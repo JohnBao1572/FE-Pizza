@@ -25,13 +25,28 @@ const Routers = ({ Component, pageProps }: any) => {
 
 	useEffect(() => {
 		const token = auth?.accessToken;
+		const role = auth?.user?.role;
+		const lowerPath = path.toLowerCase();
 
-		if (!token && !path.includes('/auth') && path !== '/') {
-			navigate('/auth/loginAdmin', { replace: true });
+		// 1. Kiểm tra quyền truy cập Dashboard
+		if (lowerPath.includes('/dashboard')) {
+			if (!token) {
+				navigate('/auth/loginAdmin', { replace: true });
+			} else if (role !== 'admin') {
+				navigate('/', { replace: true });
+			}
+			return;
 		}
 
-		if (token && path.includes('/auth')) {
-			navigate('/Dashboard', { replace: true });
+		// 2. Nếu đã đăng nhập, chặn truy cập vào các trang Auth (Login, SignUp...)
+		if (token) {
+			if (lowerPath.includes('/auth') || lowerPath.includes('/login') || lowerPath.includes('/register') || lowerPath.includes('/signup')) {
+				if (role === 'admin') {
+					navigate('/Dashboard', { replace: true });
+				} else {
+					navigate('/', { replace: true });
+				}
+			}
 		}
 	}, [auth, path, navigate]);
 

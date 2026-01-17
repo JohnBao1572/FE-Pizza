@@ -27,6 +27,12 @@ const LoginAdmin = () => {
                 method: 'post'
             }) as unknown as LoginResponse;
 
+            if (res.user.role !== 'admin') {
+                setErrorMsg('Bạn không có quyền truy cập trang quản trị!');
+                setIsLoading(false);
+                return;
+            }
+
             localStorage.setItem(localDataNames.authData, JSON.stringify(res));
             dispatch(addAuth(res));
             axiosClient.defaults.headers.common['Authorization'] = `Bearer ${res.accessToken}`;
