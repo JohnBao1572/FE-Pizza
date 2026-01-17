@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from 'react';
 import { BsArrowLeft } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
 import handleAPI from '../../../apis/handleAPI';
-import { addAuth } from '../../../reduxs/reducers/authReducer';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface SignUp {
@@ -64,11 +63,9 @@ const SignUp = () => {
                 method: 'post',
                 data: values,
             });
+            
+            setSignValues(res);
 
-            // ✅ CHANGED: lưu user vừa đăng ký → chuyển sang màn OTP
-            setSignValues(res.data);
-
-            // ✅ RESET OTP STATE
             setNumsOfCode([]);
             setTimes(60);
         } catch (error) {
@@ -93,20 +90,16 @@ const SignUp = () => {
         }
 
         try {
-            const code = numsOfCode.join('').toUpperCase();
+            const verifyCode = numsOfCode.join('').toUpperCase();
 
-            const res = await handleAPI({
-                url: `/user/verify/${signValues._id}`, // ✅ dùng id user vừa signup
+            await handleAPI({
+                url: `/user/verify/${signValues.id}`, // ✅ dùng id user vừa signup
                 method: 'put',
-                data: { code },
+                data: { verifyCode },
             });
 
-            // ✅ AUTO LOGIN
-            dispatch(addAuth(res.data));
-            localStorage.setItem('authData', JSON.stringify(res.data));
-
-            // ✅ NAVIGATE HOME
-            navigate('/');
+            message.success('Xác thực tài khoản thành công! Vui lòng đăng nhập.');
+            navigate('/login');
         } catch (error: any) {
             message.error(error.response?.data?.message || 'Verification failed');
         }
@@ -115,12 +108,16 @@ const SignUp = () => {
     const handleResendCode = async () => {
         try {
             await handleAPI({
-                url: `/user/resend/${signValues._id}`,
+                url: `/user/resend/${signValues.id}`, // id có cũng được, BE không dùng
+                method: 'post',
+                data: {
+                    email: signValues.email, // ✅ BẮT BUỘC
+                },
             });
-
-            // ✅ RESET OTP + TIMER
+    
             setNumsOfCode([]);
             setTimes(60);
+            message.success('OTP mới đã được gửi');
         } catch (error) {
             message.error('Cannot resend code');
         }

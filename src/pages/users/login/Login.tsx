@@ -39,6 +39,50 @@ const Login = () => {
         }
     };
 
+    const handleLoginGoogle = () => {
+        const width = 500;
+        const height = 600;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        const popup = window.open(
+            'http://localhost:3000/api/v1/user/google', // 🔥 URL BE GOOGLE LOGIN
+            'Google Login',
+            `width=${width},height=${height},left=${left},top=${top}`
+        );
+
+        if (!popup) {
+            message.error('Popup blocked');
+            return;
+        }
+
+        // Lắng nghe message từ popup
+        const listener = (event: MessageEvent) => {
+            if (event.origin !== 'http://localhost:3000') return;
+
+            const { accessToken, user } = event.data;
+
+            if (!accessToken) return;
+
+            const authData = {
+                accessToken,
+                user,
+            };
+
+            localStorage.setItem(localDataNames.authData, JSON.stringify(authData));
+            dispatch(addAuth(authData));
+            axiosClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+            window.removeEventListener('message', listener);
+            popup.close();
+
+            navigate('/', { replace: true });
+        };
+
+        window.addEventListener('message', listener);
+    };
+
+
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-100">
             {/* MAIN CARD */}
@@ -51,7 +95,10 @@ const Login = () => {
 
                         {/* Social */}
                         <div className="flex justify-center gap-3 mb-4">
-                            <div className="w-10 h-10 border rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                            <div
+                                className="w-10 h-10 border rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100"
+                                onClick={handleLoginGoogle}
+                            >
                                 <GoogleOutlined />
                             </div>
                             <div className="w-10 h-10 border rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100">
