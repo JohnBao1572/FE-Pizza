@@ -9,16 +9,22 @@ const cartSlice = createSlice({
     },
     reducers: {
         syncCart: (state, action) => {
-            state.data = action.payload;
+            state.data = Array.isArray(action.payload) ? action.payload : [];
         },
         addToCart: (state, action) => {
             const newItem = action.payload;
             // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa (dựa vào ID sản phẩm)
-            const index = state.data.findIndex((item) => item.prod.id === newItem.prod.id);
+            // Thêm ?. để tránh lỗi crash nếu newItem.prod chưa có dữ liệu
+            const index = state.data.findIndex(
+                (item) => item.prod?.id === newItem.prod?.id
+            );
 
             if (index !== -1) {
-                // Nếu đã tồn tại, cập nhật lại item đó (số lượng mới, giá mới từ backend trả về)
-                state.data[index] = newItem;
+                // 🔴 FIX: cộng dồn số lượng + giá
+                state.data[index].qty += newItem.qty;
+                state.data[index].totalPrice =
+                    Number(state.data[index].totalPrice) +
+                    Number(newItem.totalPrice);
             } else {
                 // Nếu chưa tồn tại, thêm mới vào mảng
                 state.data.push(newItem);
@@ -29,4 +35,5 @@ const cartSlice = createSlice({
 
 export const cartReducer = cartSlice.reducer;
 export const { syncCart, addToCart } = cartSlice.actions;
-export const cartSelector = (state: any) => state.cartReducer.data;
+export const cartSelector = (state: any) =>
+    state.cartReducer?.data || [];

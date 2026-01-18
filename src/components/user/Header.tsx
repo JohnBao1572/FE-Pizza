@@ -10,39 +10,46 @@ import { useDispatch, useSelector } from "react-redux";
 import { authSelector, removeAuth } from "../../reduxs/reducers/authReducer";
 import { Link, useNavigate } from "react-router-dom";
 import axiosClient from "../../apis/axiosClient";
-// import { cartSelector } from "../../reduxs/reducers/cartReducer";
-
-// import { useEffect, useState } from "react";
-// import handleAPI from "../../apis/handleAPI";
-// import CartModal from "../../modals/cart/CartModal";
-// // import type { CartItem } from "../../models/CartModel";
+import { cartSelector, syncCart } from "../../reduxs/reducers/cartReducer";
+import { useEffect, useState } from "react";
+import handleAPI from "../../apis/handleAPI";
+import CartModal from "../../modals/cart/CartModal";
 
 const Header = () => {
     const auth = useSelector(authSelector);
-    // const cartItems = useSelector(cartSelector);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    // const [openCart, setOpenCart] = useState(false); 
 
-    // useEffect(() => {
-    //     const fetchCart = async () => {
-    //         const authData = localStorage.getItem(localDataNames.authData);
-    //         if (!authData) return;
+    const cartItems = useSelector(cartSelector);
+    const [openCart, setOpenCart] = useState(false);
 
-    //         try {
-    //             const res: any = await handleAPI({
-    //                 url: "/carts",
-    //                 method: "get",
-    //             });
+    useEffect(() => {
+        if (cartItems.length > 0) return; // ⭐ QUAN TRỌNG
 
-    //             dispatch(syncCart(res.data)); // ⭐⭐⭐ **ĐỔ DATA VÀO REDUX**
-    //         } catch (error) {
-    //             console.log("Không thể load cart");
-    //         }
-    //     };
+        const fetchCart = async () => {
+            const authData = localStorage.getItem(localDataNames.authData);
+            if (!authData) return;
 
-    //     fetchCart();
-    // }, []);
+            try {
+                const res: any = await handleAPI({
+                    url: "/carts",
+                    method: "get",
+                });
+                console.log(res);
+                // Kiểm tra kỹ cấu trúc response để lấy mảng data chính xác
+                const cartList = res.data?.data || res.data || res;
+                dispatch(syncCart(Array.isArray(cartList) ? cartList : []));
+            } catch (error) {
+                console.log("Không thể load cart");
+            }
+        };
+
+        fetchCart();
+    }, []);
+
+    const totalQty = new Set(
+        cartItems.map(item => item.prod?.id)
+    ).size;
 
     const handleLogout = () => {
         localStorage.removeItem(localDataNames.authData);
@@ -81,11 +88,10 @@ const Header = () => {
                 <div className="flex items-center space-x-4">
                     <SearchOutlined className="text-xl text-gray-700 hover:text-red-500" />
 
-                     {/* ⭐⭐⭐ **(SỬA) BADGE LẤY SỐ ITEM TỪ REDUX** */}
-                     <Badge count={0} showZero>
+                    <Badge count={totalQty} showZero>
                         <ShoppingCartOutlined
-                            className="text-xl text-gray-700 hover:text-red-500 cursor-pointer"
-                            // onClick={() => setOpenCart(true)} // ⭐⭐⭐ **CLICK MỞ CART** cartItems.length
+                            className="text-xl cursor-pointer"
+                            onClick={() => setOpenCart(true)}
                         />
                     </Badge>
 
@@ -106,10 +112,10 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* <CartModal
+            <CartModal
                 open={openCart}
                 onClose={() => setOpenCart(false)}
-            /> */}
+            />
         </header>
     );
 };

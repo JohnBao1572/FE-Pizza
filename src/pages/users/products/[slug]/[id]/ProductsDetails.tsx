@@ -54,7 +54,6 @@ const ProductsDetails = () => {
     }, [id]);
 
     const handleAddToCart = async () => {
-        // 1. Kiểm tra đăng nhập (Token trong localStorage)
         const authData = localStorage.getItem(localDataNames.authData);
         if (!authData) {
             message.warning("Vui lòng đăng nhập để thêm vào giỏ hàng");
@@ -63,7 +62,6 @@ const ProductsDetails = () => {
         }
 
         try {
-            // 2. Gọi API thêm vào giỏ hàng
             const res: any = await handleAPI({
                 url: `/carts`,
                 method: 'post',
@@ -72,10 +70,14 @@ const ProductsDetails = () => {
                     qty: quantity
                 }
             });
-
-            // 3. Dispatch action để cập nhật Redux store (cập nhật Badge trên Header)
-            if (res && res.data) {
-                dispatch(addToCart(res.data));
+            if (res?.data) {
+                // 🔴 FIX: merge product hiện tại vào payload
+                const newItem = {
+                    ...res.data,
+                    prod: product,
+                };
+    
+                dispatch(addToCart(newItem));
                 message.success("Đã thêm sản phẩm vào giỏ hàng");
             }
         } catch (error) {
