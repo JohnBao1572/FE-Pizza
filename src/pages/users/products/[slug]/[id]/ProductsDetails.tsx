@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Spin, Alert, message, Button, Card, Tag } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Spin, Alert, message, Button, Card, Tag, InputNumber } from 'antd';
 import type { Product } from '../../../../../models/ProductModel';
 import handleAPI from '../../../../../apis/handleAPI';
 import Header from '../../../../../components/user/Header';
 import Footer from '../../../../../components/user/Footer';
+import { localDataNames } from '../../../../../constants/appInfos';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../../../../../reduxs/reducers/cartReducer';
 
 const ProductsDetails = () => {
     const { id } = useParams();
@@ -12,6 +15,9 @@ const ProductsDetails = () => {
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [quantity, setQuantity] = useState(1);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!id) {
@@ -46,6 +52,36 @@ const ProductsDetails = () => {
 
         fetchProductDetails();
     }, [id]);
+
+    const handleAddToCart = async () => {
+        // 1. Kiểm tra đăng nhập (Token trong localStorage)
+        const authData = localStorage.getItem(localDataNames.authData);
+        if (!authData) {
+            message.warning("Vui lòng đăng nhập để thêm vào giỏ hàng");
+            navigate('/login');
+            return;
+        }
+
+        try {
+            // 2. Gọi API thêm vào giỏ hàng
+            const res: any = await handleAPI({
+                url: `/carts`,
+                method: 'post',
+                data: {
+                    prodId: product?.id,
+                    qty: quantity
+                }
+            });
+
+            // 3. Dispatch action để cập nhật Redux store (cập nhật Badge trên Header)
+            if (res && res.data) {
+                dispatch(addToCart(res.data));
+                message.success("Đã thêm sản phẩm vào giỏ hàng");
+            }
+        } catch (error) {
+            message.error("Không thể thêm vào giỏ hàng");
+        }
+    };
 
     if (isLoading) {
         return (
@@ -89,7 +125,7 @@ const ProductsDetails = () => {
             <main className="flex-grow pt-28 pb-10">
                 <div className="container mx-auto px-4 lg:px-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        
+
                         {/* Ảnh sản phẩm */}
                         <Card
                             hoverable
@@ -117,9 +153,18 @@ const ProductsDetails = () => {
                                 {product.description}
                             </p>
 
+                            <div className="flex items-center gap-3 mt-2">
+                                <span className="font-medium">Số lượng:</span>
+                                <InputNumber
+                                    min={1}
+                                    value={quantity}
+                                    onChange={(val) => setQuantity(val || 1)}
+                                />
+                            </div>
+
                             <div className="flex gap-3 mt-4">
                                 <Button type="primary" size="large" className={`w-full rounded-lg ${product.quantity === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    disabled={product.quantity === 0}>
+                                    disabled={product.quantity === 0} onClick={handleAddToCart}>
                                     Thêm vào giỏ hàng
                                 </Button>
                                 <Button size="large" className={`w-full rounded-lg ${product.quantity === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -131,7 +176,7 @@ const ProductsDetails = () => {
                             <div className="mt-4 text-sm text-gray-500">
                                 <p><strong>SKU:</strong> {product.id}</p>
                                 <p className="flex items-center">
-                                    <strong>Trạng thái:</strong> 
+                                    <strong>Trạng thái:</strong>
                                     {product.quantity > 0 ? (
                                         <Tag color="green" className="ml-1">Còn hàng</Tag>
                                     ) : (

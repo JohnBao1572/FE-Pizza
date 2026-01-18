@@ -10,7 +10,6 @@ import {
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { BsArrowLeft } from 'react-icons/bs';
-import { useDispatch } from 'react-redux';
 import handleAPI from '../../../apis/handleAPI';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -25,14 +24,13 @@ const SignUp = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isAgree, setIsAgree] = useState(true);
 
-    // ✅ CHANGED: signValues dùng để quyết định hiển thị OTP hay Form
     const [signValues, setSignValues] = useState<any>(null);
 
     const [numsOfCode, setNumsOfCode] = useState<string[]>([]);
     const [times, setTimes] = useState(60);
 
     const [form] = Form.useForm();
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const inpRef1 = useRef<any>(null);
@@ -42,9 +40,7 @@ const SignUp = () => {
     const inpRef5 = useRef<any>(null);
     const inpRef6 = useRef<any>(null);
 
-    /* ================= OTP TIMER ================= */
     useEffect(() => {
-        // ✅ IMPORTANT: chỉ chạy timer khi đã signup xong (có signValues)
         if (!signValues) return;
 
         const timer = setInterval(() => {
@@ -54,7 +50,6 @@ const SignUp = () => {
         return () => clearInterval(timer);
     }, [signValues]);
 
-    /* ================= SIGN UP ================= */
     const handleSignUp = async (values: SignUp) => {
         setIsLoading(true);
         try {
@@ -75,7 +70,6 @@ const SignUp = () => {
         }
     };
 
-    /* ================= OTP ================= */
     const handleChangeNumsCode = (val: string, index: number) => {
         const items = [...numsOfCode];
         items[index] = val;
@@ -83,7 +77,6 @@ const SignUp = () => {
     };
 
     const handleVerify = async () => {
-        // ✅ IMPORTANT: check đủ 6 ký tự
         if (numsOfCode.filter(Boolean).length < 6) {
             message.error('Invalid code');
             return;
@@ -93,7 +86,7 @@ const SignUp = () => {
             const verifyCode = numsOfCode.join('').toUpperCase();
 
             await handleAPI({
-                url: `/user/verify/${signValues.id}`, // ✅ dùng id user vừa signup
+                url: `/user/verify/${signValues.id}`, 
                 method: 'put',
                 data: { verifyCode },
             });
@@ -108,10 +101,10 @@ const SignUp = () => {
     const handleResendCode = async () => {
         try {
             await handleAPI({
-                url: `/user/resend/${signValues.id}`, // id có cũng được, BE không dùng
+                url: `/user/resend/${signValues.id}`, 
                 method: 'post',
                 data: {
-                    email: signValues.email, // ✅ BẮT BUỘC
+                    email: signValues.email,
                 },
             });
     
@@ -123,7 +116,6 @@ const SignUp = () => {
         }
     };
 
-    /* ================= UI ================= */
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-100">
             <div className="w-[900px] h-[520px] bg-white rounded-2xl shadow-2xl flex overflow-hidden">
