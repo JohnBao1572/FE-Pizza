@@ -24,7 +24,7 @@ const Header = () => {
     const [openCart, setOpenCart] = useState(false);
 
     useEffect(() => {
-        if (cartItems.length > 0) return; // ⭐ QUAN TRỌNG
+        if (cartItems.length > 0) return; 
 
         const fetchCart = async () => {
             const authData = localStorage.getItem(localDataNames.authData);
