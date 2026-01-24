@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../apis/axiosClient';
 import { MdDiscount } from 'react-icons/md';
 import DiscountTable from '../../components/auth/discounts/DiscountTable';
+import BillTable from '../../components/auth/bill/BillTable';
 
 const Dashboard = () => {
   const [activeKey, setActiveKey] = useState('dashboard');
@@ -24,7 +25,7 @@ const Dashboard = () => {
     { icon: <FaBoxOpen />, label: 'Products', key: 'products' },
     { icon: <FaListUl />, label: 'Category', key: 'category' },
     { icon: <FaUser />, label: 'Users', key: 'users' },
-    { icon: <FaShoppingCart />, label: 'Carts', key: 'carts' },
+    { icon: <FaShoppingCart />, label: 'Bills', key: 'bills' },
     { icon: <MdDiscount />, label: 'Discounts', key: 'discounts' },
   ];
   const dispatch = useDispatch();
@@ -123,13 +124,19 @@ const Dashboard = () => {
             </div>
           )}
 
+          {activeKey === 'bills' && (
+            <div className="bg-white rounded-xl shadow p-6">
+              <BillTable />
+            </div>
+          )}
+
           {activeKey === 'discounts' && (
             <div className="bg-white rounded-xl shadow p-6">
               <DiscountTable />
             </div>
           )}
 
-          {activeKey !== 'category' && activeKey !== 'products' && activeKey !== 'dashboard' && activeKey !== 'discounts' &&(
+          {activeKey !== 'category' && activeKey !== 'products' && activeKey !== 'dashboard' && activeKey !== 'discounts' && activeKey !== 'bills' && (
             <div className="bg-white rounded-xl shadow p-10 text-center">
               <h2 className="text-2xl font-bold mb-2">{activeKey}</h2>
               <p className="text-gray-500">Chức năng đang được phát triển...</p>

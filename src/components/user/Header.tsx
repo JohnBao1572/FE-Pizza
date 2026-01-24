@@ -14,17 +14,18 @@ import { cartSelector, syncCart } from "../../reduxs/reducers/cartReducer";
 import { useEffect, useState } from "react";
 import handleAPI from "../../apis/handleAPI";
 import CartModal from "../../modals/cart/CartModal";
+import type { CartItem } from "../../models/CartModel";
 
 const Header = () => {
     const auth = useSelector(authSelector);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const cartItems = useSelector(cartSelector);
+    const cartItems = useSelector(cartSelector) as CartItem[];
     const [openCart, setOpenCart] = useState(false);
 
     useEffect(() => {
-        if (cartItems.length > 0) return; 
+        if (cartItems.length > 0) return;
 
         const fetchCart = async () => {
             const authData = localStorage.getItem(localDataNames.authData);
@@ -70,7 +71,7 @@ const Header = () => {
         <header className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
             <div className="container mx-auto flex items-center px-4 py-3 justify-between">
                 {/* Logo */}
-                <div className="flex items-center">
+                <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/960px-Domino%27s_pizza_logo.svg.png" alt="Pizza Hut Logo" className="h-10 mr-4" />
                     <span>Bao's Pizza</span>
                 </div>

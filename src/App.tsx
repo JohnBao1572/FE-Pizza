@@ -9,6 +9,7 @@ import ProductsDetails from './pages/users/products/[slug]/[id]/ProductsDetails'
 import Login from './pages/users/login/Login';
 import Register from './pages/users/login/SignUp';
 import SignUp from './pages/users/login/SignUp';
+import ProfilePage from './pages/users/profile/Profile';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/register" element={<Routers Component={Register} />} />
           <Route path="/auth/loginAdmin" element={<Routers Component={LoginAdmin} />} />
           <Route path="/Dashboard" element={<Routers Component={Dashboard} />} />
+          <Route path="/profile" element={<Routers Component={ProfilePage} />} />
           <Route path="/" element={<Routers Component={Home} />} />
         </Routes>
       </BrowserRouter>

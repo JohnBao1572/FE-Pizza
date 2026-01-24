@@ -1,10 +1,11 @@
-import { Modal, List, Image, Typography, Divider, InputNumber, message, Button } from "antd";
+import { Modal, List, Image, Typography, Divider, InputNumber, message, Button, Checkbox } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { cartSelector, syncCart } from "../../reduxs/reducers/cartReducer";
 import type { CartItem } from "../../models/CartModel";
 import { useEffect, useState } from "react";
 import handleAPI from "../../apis/handleAPI";
+import BillModal from "../bill/BillModal";
 
 const { Text } = Typography;
 
@@ -15,7 +16,12 @@ interface Props {
 
 type MergedCartItem = CartItem & { itemIds: string[] };
 
-const CartItemRow = ({ item, onRefresh }: { item: MergedCartItem; onRefresh: () => void }) => {
+const CartItemRow = ({ item, onRefresh, isSelected, onSelect }: {
+    item: MergedCartItem;
+    onRefresh: () => void;
+    isSelected: boolean;
+    onSelect: (ids: string[], checked: boolean) => void;
+}) => {
     const [isHovered, setIsHovered] = useState(false);
     const [quantity, setQuantity] = useState(item.qty);
     const [isConfirming, setIsConfirming] = useState(false);
@@ -104,6 +110,11 @@ const CartItemRow = ({ item, onRefresh }: { item: MergedCartItem; onRefresh: () 
 
     return (
         <List.Item
+            extra={
+                <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+                    <Checkbox checked={isSelected} onChange={(e) => onSelect(item.itemIds, e.target.checked)} />
+                </div>
+            }
             actions={[
                 <Button
                     key="delete"
@@ -162,6 +173,8 @@ const CartItemRow = ({ item, onRefresh }: { item: MergedCartItem; onRefresh: () 
 const CartModal = ({ open, onClose }: Props) => {
     const cartItems = useSelector(cartSelector) as CartItem[] || [];
     const dispatch = useDispatch();
+    const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+    const [isBillModalOpen, setIsBillModalOpen] = useState(false);
 
     const refreshCart = async () => {
         try {
@@ -195,11 +208,31 @@ const CartModal = ({ open, onClose }: Props) => {
         }, {} as Record<string, MergedCartItem>)
     );
 
-    const totalPrice = mergedCart.reduce((sum, item) => {
-        return sum + Number(item.totalPrice);
+    // Calculate total based on SELECTED items
+    const totalSelectedPrice = mergedCart.reduce((sum, item) => {
+        // Check if any of this item's IDs are in the selected list
+        const isSelected = item.itemIds.some(id => selectedItemIds.includes(id));
+        return isSelected ? sum + Number(item.totalPrice) : sum;
     }, 0);
 
     const MAX_LIST_HEIGHT = 320;
+
+    const handleSelect = (ids: string[], checked: boolean) => {
+        if (checked) {
+            setSelectedItemIds(prev => [...prev, ...ids]);
+        } else {
+            setSelectedItemIds(prev => prev.filter(id => !ids.includes(id)));
+        }
+    };
+
+    const handleCheckout = () => {
+        if (selectedItemIds.length === 0) {
+            message.warning("Vui lòng chọn sản phẩm để thanh toán");
+            return;
+        }
+        // Close cart modal logic is handled by parent usually, but here we open BillModal on top
+        setIsBillModalOpen(true);
+    };
 
     return (
         <Modal
@@ -207,9 +240,10 @@ const CartModal = ({ open, onClose }: Props) => {
             open={open}
             onCancel={onClose}
             footer={null}
+            width={600}
         >
             {cartItems.length === 0 ? (
-                <Text>Gi? hàng tr?ng</Text>
+                <Text>Giỏ hàng trong</Text>
             ) : (
                 <>
                     <div
@@ -222,7 +256,14 @@ const CartModal = ({ open, onClose }: Props) => {
                         <List
                             itemLayout="horizontal"
                             dataSource={mergedCart}
-                            renderItem={(item: MergedCartItem) => <CartItemRow item={item} onRefresh={refreshCart} />}
+                            renderItem={(item: MergedCartItem) => (
+                                <CartItemRow
+                                    item={item}
+                                    onRefresh={refreshCart}
+                                    isSelected={item.itemIds.every(id => selectedItemIds.includes(id))}
+                                    onSelect={handleSelect}
+                                />
+                            )}
                         />
                     </div>
 
@@ -238,10 +279,35 @@ const CartModal = ({ open, onClose }: Props) => {
                     >
                         <Text strong>Tổng cộng</Text>
                         <Text strong style={{ fontSize: 16 }}>
-                            {totalPrice.toLocaleString('vi-VN')}₫
+                            {totalSelectedPrice.toLocaleString('vi-VN')}₫
                         </Text>
                     </div>
+
+                    <Button
+                        type="primary"
+                        block
+                        style={{ marginTop: 16 }}
+                        onClick={handleCheckout}
+                        disabled={selectedItemIds.length === 0}
+                    >
+                        Thanh toán ({selectedItemIds.length} sản phẩm)
+                    </Button>
                 </>
+            )}
+
+            {isBillModalOpen && (
+                <BillModal
+                    open={isBillModalOpen}
+                    onClose={() => setIsBillModalOpen(false)}
+                    selectedItems={mergedCart.filter(item => item.itemIds.some(id => selectedItemIds.includes(id)))}
+                    selectedIds={selectedItemIds}
+                    totalPrice={totalSelectedPrice}
+                    onSuccess={() => {
+                        refreshCart();
+                        setSelectedItemIds([]);
+                        onClose(); // Close cart as well
+                    }}
+                />
             )}
         </Modal>
     );
