@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, message, Space, Table, Tag, Tooltip, Popconfirm } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, message, Space, Table, Tag, Tooltip, Modal, Form, Select } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import handleAPI from '../../../apis/handleAPI';
 import type { BillModel } from '../../../models/BillModel';
@@ -8,6 +8,9 @@ import type { BillModel } from '../../../models/BillModel';
 const BillTable = () => {
     const [bills, setBills] = useState<BillModel[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingBill, setEditingBill] = useState<BillModel | null>(null);
+    const [form] = Form.useForm();
 
     const getBills = async () => {
         setIsLoading(true);
@@ -34,16 +37,18 @@ const BillTable = () => {
         getBills();
     }, []);
 
-    const handleDelete = async (id: string) => {
+    const handleUpdateStatus = async (values: any) => {
         try {
             await handleAPI({
-                url: `/bills/${id}`,
-                method: 'delete',
+                url: `/bills/${editingBill?.id}`,
+                method: 'patch',
+                data: values,
             });
-            message.success('Bill deleted');
+            message.success('Bill status updated');
+            setIsModalOpen(false);
             getBills();
         } catch (error) {
-            message.error('Failed to delete bill');
+            message.error('Failed to update bill status');
             console.error(error);
         }
     };
@@ -60,20 +65,6 @@ const BillTable = () => {
             dataIndex: 'addedBy',
             key: 'addedBy',
             render: (user: any) => user?.email || 'Guest',
-        },
-        {
-            title: 'Products',
-            dataIndex: 'cart',
-            key: 'cart',
-            render: (cart: any[]) => (
-                <ul style={{ paddingLeft: 20, margin: 0 }}>
-                    {cart?.map((item: any) => (
-                        <li key={item.id} style={{ listStyleType: 'circle' }}>
-                            {item.prod?.title || 'Product'} <span style={{ color: '#888' }}>(x{item.qty})</span>
-                        </li>
-                    ))}
-                </ul>
-            ),
         },
         {
             title: 'Total Price',
@@ -94,7 +85,9 @@ const BillTable = () => {
                     case 'pending': color = 'orange'; break;
                     case 'confirm': color = 'blue'; break;
                     case 'shipping': color = 'cyan'; break;
+                    case 'delivery': color = 'cyan'; break;
                     case 'delivered': color = 'green'; break;
+                    case 'completed': color = 'green'; break;
                     case 'cancelled': color = 'red'; break;
                     default: color = 'default';
                 }
@@ -117,18 +110,12 @@ const BillTable = () => {
                             icon={<EditOutlined />}
                             type="primary"
                             ghost
-                            onClick={() => message.info('Tính năng đang phát triển')}
+                            onClick={() => {
+                                setEditingBill(record);
+                                form.setFieldsValue({ status: record.status });
+                                setIsModalOpen(true);
+                            }}
                         />
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                        <Popconfirm
-                            title="Delete this bill?"
-                            onConfirm={() => handleDelete(record.id)}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <Button icon={<DeleteOutlined />} danger ghost />
-                        </Popconfirm>
                     </Tooltip>
                 </Space>
             ),
@@ -142,8 +129,25 @@ const BillTable = () => {
                 dataSource={bills}
                 columns={columns}
                 rowKey="id"
-                pagination={{ pageSize: 7 }}
+                pagination={{ pageSize: 10 }}
             />
+
+            <Modal
+                title="Update Bill Status"
+                open={isModalOpen}
+                onCancel={() => setIsModalOpen(false)}
+                onOk={() => form.submit()}
+            >
+                <Form form={form} layout="vertical" onFinish={handleUpdateStatus}>
+                    <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+                        <Select>
+                            <Select.Option value="pending">Pending</Select.Option>
+                            <Select.Option value="delivery">Delivery</Select.Option>
+                            <Select.Option value="completed">Completed</Select.Option>
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };

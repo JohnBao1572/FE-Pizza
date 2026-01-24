@@ -29,15 +29,12 @@ const ProfilePage = () => {
             style={{
                 minHeight: '100vh',
                 background: '#f4f6f8',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                padding: '60px 0',
+                padding: '60px 20px',
             }}
         >
             <Card
                 style={{
-                    width: '1200px',
+                    width: '100%',
                     borderRadius: '12px',
                     boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
                 }}

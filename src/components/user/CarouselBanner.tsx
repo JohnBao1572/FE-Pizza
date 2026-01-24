@@ -49,21 +49,23 @@ const CarouselBanner = () => {
     }
 
     return (
-        <div className="w-full max-w-screen-xl mx-auto">
-            <div className="w-full h-64 rounded-xl overflow-hidden shadow-lg relative z-0">
-                <Carousel autoplay>
-                    {banners.map((banner) => (
-                        <div key={banner.id} className="bg-gray-100">
-                            <img
-                                src={banner.image?.[0]}
-                                className="w-full h-64 object-contain"
-                                alt={banner.title}
-                            />
-                        </div>
-                    ))}
-                </Carousel>
-            </div>
+        // <div className="w-full">
+        //     <div className="w-full h-64 rounded-xl overflow-hidden shadow-lg relative z-0">
+        <div className="w-full overflow-hidden">
+            <Carousel autoplay>
+                {banners.map((banner) => (
+                    <div key={banner.id} className="bg-gray-100">
+                        <img
+                            src={banner.image?.[0]}
+                            className="w-full h-64 object-cover"
+                            alt={banner.title}
+                        />
+                    </div>
+                ))}
+            </Carousel>
         </div>
+        //     </div>
+        // </div>
     );
 };
 

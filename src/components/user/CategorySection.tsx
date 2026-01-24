@@ -43,7 +43,7 @@ const CategorySection = () => {
     const canPrev = page > 0;
 
     return (
-        <div className="container mx-auto py-8 ">
+        <div className="w-full px-10 py-8">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">You will be liked</h2>
 
