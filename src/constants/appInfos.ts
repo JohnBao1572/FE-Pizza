@@ -9,7 +9,9 @@ export const appInfo = {
 
     title: 'Thiên Bảo',
     description: '',
-    baseUrl: 'http://localhost:3000/api/v1',
+    baseUrl: import.meta.env.MODE === 'development' 
+    ? 'http://localhost:3000/api/v1' 
+    : 'https://be-pizzashop.onrender.com/api/v1',
     monthShortNames: [
 		'Jan',
 		'Feb',
