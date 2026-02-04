@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import handleAPI from '../../../apis/handleAPI';
 import type { LoginResponse } from '../../../models/UserModel';
-import { localDataNames } from '../../../constants/appInfos';
+import { appInfo, localDataNames } from '../../../constants/appInfos';
 import { addAuth } from '../../../reduxs/reducers/authReducer';
 import axiosClient from '../../../apis/axiosClient';
 const Login = () => {
@@ -45,8 +45,10 @@ const Login = () => {
         const left = window.screenX + (window.outerWidth - width) / 2;
         const top = window.screenY + (window.outerHeight - height) / 2;
 
+        const googleLoginUrl = `${appInfo.baseUrl}/user/google`;
+
         const popup = window.open(
-            'http://localhost:3000/api/v1/user/google', // 🔥 URL BE GOOGLE LOGIN
+            googleLoginUrl,
             'Google Login',
             `width=${width},height=${height},left=${left},top=${top}`
         );
